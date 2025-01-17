@@ -9,116 +9,57 @@ contract Todo {
   }
 
   struct Task {
-    uint256 id;
     uint256 timestamp;
     string definition;
     Status status;
   }
 
-  mapping(address => uint256) latestTaskIdByOwner;
+  address public owner;
+  Task[] public tasks;
 
-  function getNextTaskId() private returns (uint256) {
-    return latestTaskIdByOwner[msg.sender]++;
+  mapping(uint256 => bool) public deletedTasks;
+
+  constructor() {
+    owner = msg.sender;
   }
 
-  mapping(address => Task[]) tasksByOwner;
+  error OnlyOwnerCanInteract();
+  error WrongValueForTaskCreation();
+  error CannotModifyUnexistingTask();
+  error CannotModifyDeletedTask();
+  error CannotDeleteUnexistingTask();
+  error AlreadyDeletedTask();
 
-  function getAllTasks() external view returns (Task[] memory) {
-    return tasksByOwner[msg.sender];
-  }
-
-  error NotEnoughETH(string message);
-
-  modifier ensurePayment() {
-    if (msg.value < 0.01 ether) {
-      revert NotEnoughETH("You need 0.01 ETH to create a task");
-    }
-
-    uint256 remaining = msg.value - 0.01 ether;
-
-    if (remaining > 0) {
-      payable(msg.sender).transfer(remaining);
-    }
+  modifier ensureOwner() {
+    if (msg.sender != owner) revert OnlyOwnerCanInteract();
 
     _;
   }
 
-  function createTask(string calldata definition) external payable ensurePayment {
-    Task memory newTask = Task({
-      id: getNextTaskId(),
-      timestamp: block.timestamp,
-      definition: definition,
-      status: Status.todo
-    });
+  function createTask(string calldata definition) external payable ensureOwner {
+    if (msg.value != 0.01 ether) revert WrongValueForTaskCreation();
 
-    tasksByOwner[msg.sender].push(newTask);
+    tasks.push(Task({timestamp: block.timestamp, definition: definition, status: Status.todo}));
   }
 
-  function doesTaskExist(uint256 taskId) private view returns (bool) {
-    Task[] storage tasks = tasksByOwner[msg.sender];
+  function modifyTask(
+    uint256 index,
+    string calldata newDefinition,
+    Status newStatus
+  ) external ensureOwner {
+    if (index >= tasks.length) revert CannotModifyUnexistingTask();
+    if (deletedTasks[index] == true) revert CannotModifyDeletedTask();
 
-    for (uint256 i = 0; i < tasks.length; ++i) {
-      if (tasks[i].id == taskId) return true;
-    }
-    return false;
+    tasks[index].definition = newDefinition;
+    tasks[index].status = newStatus;
   }
 
-  error UnexistingTask(address owner, uint256 taskId);
-  error InvalidDefinition(string msg);
+  function deleteTask(uint256 index) external ensureOwner {
+    if (index >= tasks.length) revert CannotDeleteUnexistingTask();
+    if (deletedTasks[index] == true) revert AlreadyDeletedTask();
 
-  modifier ensureTaskExists(uint256 taskId) {
-    if (!doesTaskExist(taskId)) {
-      revert UnexistingTask(msg.sender, taskId);
-    }
+    payable(owner).transfer(0.01 ether);
 
-    _;
-  }
-
-  function updateTaskDefinition(uint256 taskId, string calldata definition) external ensureTaskExists(taskId) {
-    if (bytes(definition).length == 0) {
-      revert InvalidDefinition("the task definition must not be empty");
-    }
-
-    Task[] storage tasks = tasksByOwner[msg.sender];
-
-    for (uint256 i = 0; i < tasks.length; ++i) {
-      Task storage task = tasks[i];
-
-      if (task.id == taskId) {
-        task.definition = definition;
-        return;
-      }
-    }
-  }
-
-  function updateTaskStatus(uint256 taskId, Status status) external ensureTaskExists(taskId) {
-    Task[] storage tasks = tasksByOwner[msg.sender];
-
-    for (uint256 i = 0; i < tasks.length; ++i) {
-      Task storage task = tasks[i];
-
-      if (task.id == taskId) {
-        task.status = status;
-        return;
-      }
-    }
-  }
-
-  function deleteTask(uint256 taskId) external payable {
-    if (!doesTaskExist(taskId)) {
-      revert UnexistingTask(msg.sender, taskId);
-    }
-
-    Task[] storage tasks = tasksByOwner[msg.sender];
-
-    for (uint256 i = 0; i < tasks.length - 1; ++i) {
-      if (tasks[i].id != taskId) continue;
-
-      tasks[i] = tasks[i + 1];
-    }
-
-    tasks.pop();
-
-    payable(msg.sender).transfer(0.01 ether);
+    deletedTasks[index] = true;
   }
 }
