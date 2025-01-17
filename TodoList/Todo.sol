@@ -25,6 +25,8 @@ contract Todo {
 
   error OnlyOwnerCanInteract();
   error WrongValueForTaskCreation();
+  error AlreadyDeletedTask();
+  error CannotDeleteUnexistingTask();
 
   modifier ensureOwner() {
     if (msg.sender != owner) revert OnlyOwnerCanInteract();
@@ -48,6 +50,9 @@ contract Todo {
   }
 
   function deleteTask(uint256 index) external ensureOwner {
+    if (index >= tasks.length) revert CannotDeleteUnexistingTask();
+    if (deletedTasks[index] == true) revert AlreadyDeletedTask();
+
     payable(owner).transfer(0.01 ether);
 
     deletedTasks[index] = true;
