@@ -40,11 +40,7 @@ contract Todo {
     tasks.push(Task({timestamp: block.timestamp, definition: definition, status: Status.todo}));
   }
 
-  function modifyTask(
-    uint256 index,
-    string calldata newDefinition,
-    Status newStatus
-  ) external ensureOwner {
+  function modifyTask(uint256 index, string calldata newDefinition, Status newStatus) external ensureOwner {
     tasks[index].definition = newDefinition;
     tasks[index].status = newStatus;
   }
