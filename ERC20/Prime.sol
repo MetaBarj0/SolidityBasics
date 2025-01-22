@@ -59,7 +59,11 @@ contract Prime is IERC20 {
     return true;
   }
 
-  function transferFrom(address from, address to, uint256 value) public override returns (bool success) {
+  function transferFrom(
+    address from,
+    address to,
+    uint256 value
+  ) public override returns (bool success) {
     if (_allowances[from][msg.sender] < value) return false;
 
     _balances[from] -= value;
@@ -79,7 +83,10 @@ contract Prime is IERC20 {
     return true;
   }
 
-  function allowance(address owner, address spender) public view override returns (uint256 remaining) {
+  function allowance(
+    address owner,
+    address spender
+  ) public view override returns (uint256 remaining) {
     return _allowances[owner][spender];
   }
 
