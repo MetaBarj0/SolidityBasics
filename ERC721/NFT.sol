@@ -36,8 +36,8 @@ abstract contract NFT is SimplifiedERC721 {
 
   function transferFrom(address from, address to, uint256 tokenId) external payable override {
     require(to != address(0) && from != address(0), InvalidZeroAddress());
-    require(_ownedTokens[tokenId] == from, NotOwner());
     require(_ownedTokens[tokenId] != address(0), InvalidTokenId());
+    require(_ownedTokens[tokenId] == from, NotOwner());
     require(_senderIsOwnerOrOperatorOrApproved(from, tokenId), NotOwnerNorOperatorNorApproved());
 
     delete _tokenApprovals[from];
@@ -52,6 +52,7 @@ abstract contract NFT is SimplifiedERC721 {
       _senderIsOwnerOrOperatorOrApproved(approved, tokenId),
       NotOwnerNorOperatorNorApproved()
     );
+    require(_ownedTokens[tokenId] != address(0), InvalidTokenId());
 
     _tokenApprovals[approved] = tokenId;
     _approvalTokens[tokenId] = approved;
@@ -79,7 +80,7 @@ abstract contract NFT is SimplifiedERC721 {
 
   mapping(address owner => uint256 amount) internal _balances;
   mapping(uint256 tokenId => address owner) internal _ownedTokens;
-  mapping(uint256 tokenId => address approved) private _approvalTokens;
+  mapping(uint256 tokenId => address approved) internal _approvalTokens;
   mapping(address approved => uint256 tokenId) private _tokenApprovals;
   mapping(address owner => mapping(address operator => bool approved)) private _approvedOperators;
 
