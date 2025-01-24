@@ -29,7 +29,7 @@ abstract contract NFT is SimplifiedERC721 {
   function ownerOf(uint256 tokenId) external view override returns (address) {
     address owner = _ownedTokens[tokenId];
 
-    if (owner == address(0)) revert InvalidZeroAddress();
+    if (owner == address(0)) revert InvalidTokenId();
 
     return owner;
   }
