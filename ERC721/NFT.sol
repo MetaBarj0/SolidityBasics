@@ -3,13 +3,13 @@ pragma solidity 0.8.28;
 
 import "./SimplifiedERC721.sol";
 
-contract NFT is SimplifiedERC721 {
+abstract contract NFT is SimplifiedERC721 {
   string public name;
   string public symbol;
   uint8 public totalSupply;
 
-  constructor() {
-    _owner = msg.sender;
+  constructor(address owner) {
+    _owner = owner;
     name = "Useless NFT";
     symbol = "UNFT";
     totalSupply = 10;
@@ -77,8 +77,8 @@ contract NFT is SimplifiedERC721 {
     return _approvedOperators[owner][operator];
   }
 
-  mapping(address owner => uint256 amount) private _balances;
-  mapping(uint256 tokenId => address owner) private _ownedTokens;
+  mapping(address owner => uint256 amount) internal _balances;
+  mapping(uint256 tokenId => address owner) internal _ownedTokens;
   mapping(uint256 tokenId => address approved) private _approvalTokens;
   mapping(address approved => uint256 tokenId) private _tokenApprovals;
   mapping(address owner => mapping(address operator => bool approved)) private _approvedOperators;
