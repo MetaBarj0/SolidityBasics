@@ -25,7 +25,7 @@ contract Tests is NFT {
   }
 
   function getRemainingSupply() external view returns (uint8) {
-    return totalSupply - _mintedTokenCount;
+    return totalSupply - (_mintedTokenCount - _burntTokenCount);
   }
 
   function burn(uint256 tokenId) external {
@@ -33,8 +33,10 @@ contract Tests is NFT {
 
     delete _ownedTokens[tokenId];
     delete _approvalTokens[tokenId];
+
     _balances[msg.sender]--;
     totalSupply--;
+    _burntTokenCount++;
   }
 
   function _getTokenPrice() private view returns (uint256) {
@@ -42,4 +44,5 @@ contract Tests is NFT {
   }
 
   uint8 _mintedTokenCount;
+  uint8 _burntTokenCount;
 }
