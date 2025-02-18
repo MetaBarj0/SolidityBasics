@@ -24,18 +24,18 @@ contract Todo {
   }
 
   error OnlyOwnerCanInteract();
-  error WrongValueForTaskCreation();
+  error NotEnoughEth(uint256 price);
   error AlreadyDeletedTask();
-  error CannotDeleteUnexistingTask();
+  error InvalidTaskId();
 
   modifier ensureOwner() {
-    if (msg.sender != owner) revert OnlyOwnerCanInteract();
+    require(msg.sender == owner, OnlyOwnerCanInteract());
 
     _;
   }
 
   function createTask(string calldata definition) external payable ensureOwner {
-    if (msg.value != 0.01 ether) revert WrongValueForTaskCreation();
+    require(msg.value == 0.01 ether, NotEnoughEth(0.01 ether));
 
     tasks.push(Task({timestamp: block.timestamp, definition: definition, status: Status.todo}));
   }
@@ -49,12 +49,12 @@ contract Todo {
     tasks[index].status = newStatus;
   }
 
-  function deleteTask(uint256 index) external ensureOwner {
-    if (index >= tasks.length) revert CannotDeleteUnexistingTask();
-    if (deletedTasks[index] == true) revert AlreadyDeletedTask();
+  function deleteTask(uint256 taskId) external ensureOwner {
+    require(taskId < tasks.length, InvalidTaskId());
+    require(!deletedTasks[taskId], AlreadyDeletedTask());
 
     payable(owner).transfer(0.01 ether);
 
-    deletedTasks[index] = true;
+    deletedTasks[taskId] = true;
   }
 }
