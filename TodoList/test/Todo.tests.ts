@@ -57,5 +57,42 @@ describe("Todo contract", () => {
       return createTx.should.emit(contract, "TaskCreated")
         .withArgs(id, definition);
     });
+
+    it("should be possible for the owner to create several tasks if it has ethers", () => {
+      const [owner] = signers;
+
+      return Promise.all([
+        createTask(contract, owner, "first task").should.emit(
+          contract,
+          "TaskCreated",
+        ),
+        createTask(contract, owner, "second task").should.emit(
+          contract,
+          "TaskCreated",
+        ),
+        createTask(contract, owner, "third task").should.emit(
+          contract,
+          "TaskCreated",
+        ),
+      ]);
+    });
+
+    it("should not be possible for the non owner to modify a task", () => {
+      const [_owner, nonOwner] = signers;
+
+      return contract.connect(nonOwner).modifyTask(0, "new definition", 0)
+        .should.be.revertedWithCustomError(contract, "Unauthorized");
+    });
   });
 });
+
+async function createTask(contract: Todo, owner: Signer, definition: string) {
+  const tx = await contract.connect(owner).createTask(
+    definition,
+    {
+      value: ethers.parseEther("0.01"),
+    },
+  );
+
+  return tx.wait();
+}
