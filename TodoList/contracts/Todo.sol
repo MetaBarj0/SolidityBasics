@@ -25,7 +25,6 @@ contract Todo {
 
   error Unauthorized();
   error NotEnoughEth(uint256 price);
-  error AlreadyDeletedTask();
   error InvalidTaskId();
 
   event TaskCreated(uint256 indexed id, string definition);
@@ -60,7 +59,6 @@ contract Todo {
 
   function deleteTask(uint256 taskId) external ensureOwner {
     require(taskId < tasks.length, InvalidTaskId());
-    require(!deletedTasks[taskId], AlreadyDeletedTask());
 
     payable(owner).transfer(0.01 ether);
 

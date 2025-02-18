@@ -107,6 +107,13 @@ describe("Todo contract", () => {
       return contract.connect(nonOwner).deleteTask(0)
         .should.be.revertedWithCustomError(contract, "Unauthorized");
     });
+
+    it("should not be possible to delete an unexisting task", () => {
+      const [owner] = signers;
+
+      return contract.connect(owner).deleteTask(0)
+        .should.be.revertedWithCustomError(contract, "InvalidTaskId");
+    });
   });
 });
 
