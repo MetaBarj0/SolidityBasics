@@ -29,6 +29,7 @@ contract Todo {
   error InvalidTaskId();
 
   event TaskCreated(uint256 indexed id, string definition);
+  event TaskModified(uint256 indexed id, string newDefinition, Status newStatus);
 
   modifier ensureOwner() {
     require(msg.sender == owner, Unauthorized());
@@ -53,6 +54,8 @@ contract Todo {
 
     tasks[taskId].definition = newDefinition;
     tasks[taskId].status = newStatus;
+
+    emit TaskModified(taskId, newDefinition, newStatus);
   }
 
   function deleteTask(uint256 taskId) external ensureOwner {

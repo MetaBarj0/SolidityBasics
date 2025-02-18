@@ -28,7 +28,7 @@ describe("Todo contract", () => {
     });
   });
 
-  describe("Transcations", () => {
+  describe("Transactions", () => {
     it("should not be possible to create a task if the sender is not the owner", () => {
       const [_, notOwner] = signers;
 
@@ -89,6 +89,16 @@ describe("Todo contract", () => {
 
       return contract.connect(owner).modifyTask(0, "new definition", 2)
         .should.be.revertedWithCustomError(contract, "InvalidTaskId");
+    });
+
+    it("should emit the TaskModified event at task modification", async () => {
+      const [owner] = signers;
+
+      await createTask(contract, owner, "old definition");
+
+      return contract.connect(owner).modifyTask(0, "new definition", 1)
+        .should.emit(contract, "TaskModified")
+        .withArgs(0, "new definition", 1);
     });
   });
 });
