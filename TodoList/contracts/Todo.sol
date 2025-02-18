@@ -27,8 +27,9 @@ contract Todo {
   error NotEnoughEth(uint256 price);
   error InvalidTaskId();
 
-  event TaskCreated(uint256 indexed id, string definition);
-  event TaskModified(uint256 indexed id, string newDefinition, Status newStatus);
+  event TaskCreated(uint256 indexed taskId, string definition);
+  event TaskModified(uint256 indexed taskId, string newDefinition, Status newStatus);
+  event TaskDeleted(uint256 indexed taskId);
 
   modifier ensureOwner() {
     require(msg.sender == owner, Unauthorized());
@@ -63,5 +64,7 @@ contract Todo {
     payable(owner).transfer(0.01 ether);
 
     deletedTasks[taskId] = true;
+
+    emit TaskDeleted(taskId);
   }
 }

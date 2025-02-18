@@ -114,6 +114,41 @@ describe("Todo contract", () => {
       return contract.connect(owner).deleteTask(0)
         .should.be.revertedWithCustomError(contract, "InvalidTaskId");
     });
+
+    it("should emit a TaskDeleted event at task deletion", async () => {
+      const [owner] = signers;
+
+      await createTask(contract, owner, "definition");
+
+      return contract.connect(owner).deleteTask(0)
+        .should.emit(contract, "TaskDeleted")
+        .withArgs(0);
+    });
+
+    it("should be possible for the owner to delete one task and get refunded", async () => {
+      const [owner] = signers;
+
+      const oldBalance = await ethers.provider.getBalance(owner);
+
+      const createTaskReceipt = await createTask(
+        contract,
+        owner,
+        "task definition",
+      );
+
+      const createTaskFee = BigInt(createTaskReceipt.gasUsed) *
+        createTaskReceipt.gasPrice;
+
+      const deleteTaskReceipt = await deleteTask(contract, owner, 0n);
+      const deleteTaskFee = BigInt(deleteTaskReceipt.gasUsed) *
+        deleteTaskReceipt.gasPrice;
+
+      const newBalance = await ethers.provider.getBalance(owner);
+
+      return newBalance.should.equal(
+        oldBalance - createTaskFee - deleteTaskFee,
+      );
+    });
   });
 });
 
@@ -124,6 +159,12 @@ async function createTask(contract: Todo, owner: Signer, definition: string) {
       value: ethers.parseEther("0.01"),
     },
   );
+
+  return tx.wait();
+}
+
+async function deleteTask(contract: Todo, owner: Signer, taskId: bigint) {
+  const tx = await contract.connect(owner).deleteTask(taskId);
 
   return tx.wait();
 }
