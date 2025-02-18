@@ -1,0 +1,20 @@
+{
+  "name": "hardhat-project",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "@types/chai-as-promised": "^8.0.1",
+    "@types/node": "^22.12.0",
+    "chai-as-promised": "^8.0.1",
+    "hardhat": "^2.22.18",
+    "hardhat-watcher": "^2.5.0"
+  },
+  "scripts": {
+    "test": "npx hardhat test",
+    "compile": "npx hardhat compile",
+    "clean": "npx hardhat clean",
+    "watch": "npm run test && npx hardhat watch test",
+    "deployLocal": "npx hardhat ignition deploy ./ignition/modules/Todo.ts",
+    "deploySepolia": "npx hardhat ignition deploy --network sepolia --verify ./ignition/modules/Todo.ts",
+    "coverage": "npx hardhat coverage"
+  }
+}
