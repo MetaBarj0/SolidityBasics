@@ -23,13 +23,13 @@ contract Todo {
     owner = msg.sender;
   }
 
-  error OnlyOwnerCanInteract();
+  error Unauthorized();
   error NotEnoughEth(uint256 price);
   error AlreadyDeletedTask();
   error InvalidTaskId();
 
   modifier ensureOwner() {
-    require(msg.sender == owner, OnlyOwnerCanInteract());
+    require(msg.sender == owner, Unauthorized());
 
     _;
   }
