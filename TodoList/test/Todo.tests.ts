@@ -43,5 +43,19 @@ describe("Todo contract", () => {
         .should.be.revertedWithCustomError(contract, "NotEnoughEth")
         .withArgs(ethers.parseEther("0.01"));
     });
+
+    it("should emit a TaskCreated event when the owner successfully create the first task", async () => {
+      const [owner] = signers;
+      const [id, definition] = [0, "paid task"];
+
+      const createTx = await contract.connect(owner).createTask(definition, {
+        value: ethers.parseEther("0.01"),
+      });
+
+      await createTx.wait();
+
+      return createTx.should.emit(contract, "TaskCreated")
+        .withArgs(id, definition);
+    });
   });
 });
