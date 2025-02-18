@@ -35,5 +35,13 @@ describe("Todo contract", () => {
       return contract.connect(notOwner).createTask("a task")
         .should.be.revertedWithCustomError(contract, "Unauthorized");
     });
+
+    it("should not be possible for the owner to create a task for free", () => {
+      const [owner] = signers;
+
+      return contract.connect(owner).createTask("Free task?")
+        .should.be.revertedWithCustomError(contract, "NotEnoughEth")
+        .withArgs(ethers.parseEther("0.01"));
+    });
   });
 });
