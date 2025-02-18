@@ -19,6 +19,12 @@ describe("Todo contract", () => {
   });
 
   describe("Deployment", () => {
+    it("should set the owner as the deployer of the contract", () => {
+      const [owner] = signers;
+
+      return contract.owner()
+        .should.eventually.equal(owner);
+    });
   });
 
   describe("Initial state", () => {
