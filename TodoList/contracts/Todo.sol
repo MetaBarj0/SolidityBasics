@@ -45,12 +45,14 @@ contract Todo {
   }
 
   function modifyTask(
-    uint256 index,
+    uint256 taskId,
     string calldata newDefinition,
     Status newStatus
   ) external ensureOwner {
-    tasks[index].definition = newDefinition;
-    tasks[index].status = newStatus;
+    require(taskId < tasks.length, InvalidTaskId());
+
+    tasks[taskId].definition = newDefinition;
+    tasks[taskId].status = newStatus;
   }
 
   function deleteTask(uint256 taskId) external ensureOwner {

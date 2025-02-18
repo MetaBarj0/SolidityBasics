@@ -83,6 +83,13 @@ describe("Todo contract", () => {
       return contract.connect(nonOwner).modifyTask(0, "new definition", 0)
         .should.be.revertedWithCustomError(contract, "Unauthorized");
     });
+
+    it("should not be possible to modify an unexisting task", () => {
+      const [owner] = signers;
+
+      return contract.connect(owner).modifyTask(0, "new definition", 2)
+        .should.be.revertedWithCustomError(contract, "InvalidTaskId");
+    });
   });
 });
 
