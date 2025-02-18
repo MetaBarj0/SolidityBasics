@@ -100,6 +100,13 @@ describe("Todo contract", () => {
         .should.emit(contract, "TaskModified")
         .withArgs(0, "new definition", 1);
     });
+
+    it("should not be possible for a non owner to attempt to delete a task", () => {
+      const [_owner, nonOwner] = signers;
+
+      return contract.connect(nonOwner).deleteTask(0)
+        .should.be.revertedWithCustomError(contract, "Unauthorized");
+    });
   });
 });
 
