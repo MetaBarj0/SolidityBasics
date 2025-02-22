@@ -37,7 +37,7 @@ contract Todo {
     _;
   }
 
-  function createTask(string calldata definition) external payable ensureOwner {
+  function createTask(string calldata definition) public payable ensureOwner {
     require(msg.value == 0.01 ether, NotEnoughEth(0.01 ether));
 
     tasks.push(Task({timestamp: block.timestamp, definition: definition, status: Status.todo}));
@@ -49,7 +49,7 @@ contract Todo {
     uint256 taskId,
     string calldata newDefinition,
     Status newStatus
-  ) external ensureOwner {
+  ) public ensureOwner {
     require(taskId < tasks.length, InvalidTaskId());
 
     tasks[taskId].definition = newDefinition;
@@ -58,7 +58,7 @@ contract Todo {
     emit TaskModified(taskId, newDefinition, newStatus);
   }
 
-  function deleteTask(uint256 taskId) external ensureOwner {
+  function deleteTask(uint256 taskId) public ensureOwner {
     require(taskId < tasks.length, InvalidTaskId());
 
     payable(owner).transfer(0.01 ether);
