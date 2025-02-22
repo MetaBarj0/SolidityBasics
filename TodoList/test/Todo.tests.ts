@@ -1,8 +1,8 @@
 import * as chai from "chai";
 import chaiAsPromised from "chai-as-promised";
 import { ethers } from "hardhat";
-import { Signer } from "./utility/types.ts";
-import { Todo } from "../typechain-types/index.ts";
+import { Signer } from "./utility/types";
+import { Todo, Todo__factory } from "../typechain-types";
 
 chai.use(chaiAsPromised);
 chai.should();
@@ -16,7 +16,8 @@ describe("Todo contract", () => {
   });
 
   beforeEach(async () => {
-    contract = await ethers.deployContract("Todo");
+    const genericContract = await ethers.deployContract("Todo");
+    contract = Todo__factory.connect(await genericContract.getAddress(), ethers.provider);
   });
 
   describe("Deployment", () => {
@@ -136,12 +137,12 @@ describe("Todo contract", () => {
         "task definition",
       );
 
-      const createTaskFee = BigInt(createTaskReceipt.gasUsed) *
-        createTaskReceipt.gasPrice;
+      const createTaskFee = BigInt(createTaskReceipt!.gasUsed) *
+        createTaskReceipt!.gasPrice;
 
       const deleteTaskReceipt = await deleteTask(contract, owner, 0n);
-      const deleteTaskFee = BigInt(deleteTaskReceipt.gasUsed) *
-        deleteTaskReceipt.gasPrice;
+      const deleteTaskFee = BigInt(deleteTaskReceipt!.gasUsed) *
+        deleteTaskReceipt!.gasPrice;
 
       const newBalance = await ethers.provider.getBalance(owner);
 
