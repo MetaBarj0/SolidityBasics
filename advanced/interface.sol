@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.28;
+pragma solidity 0.8.28;
 
 // Let's imagine we don't have access to this implementation
 // Therefore, we cannot explicitly make this contract implements the ICounter
