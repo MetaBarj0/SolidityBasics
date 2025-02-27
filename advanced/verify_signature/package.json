@@ -1,0 +1,15 @@
+{
+  "scripts": {
+    "compile": "npx hardhat compile",
+    "test": "npx hardhat test",
+    "watch": "npm run test; npx hardhat watch test",
+    "coverage": "npx hardhat coverage"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "@types/chai-as-promised": "^8.0.1",
+    "chai-as-promised": "^8.0.1",
+    "hardhat": "^2.22.19",
+    "hardhat-watcher": "^2.5.0"
+  }
+}
