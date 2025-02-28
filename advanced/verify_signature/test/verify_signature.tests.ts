@@ -29,13 +29,13 @@ describe("verify signature", () => {
     const message = "Hello there!";
     const nonce = 123n;
     const messageHash = await contract.getMessageHash(to, amount, message, nonce);
-    const signature = await signer.signMessage(messageHash);
+    const signature = await signer.signMessage(ethers.getBytes(messageHash));
 
     return Promise.all([
       contract.verify(signer, to, amount, message, nonce, signature)
         .should.eventually.be.true,
       contract.verify(signer, to, amount + 1n, message, nonce, signature)
-        .should.eventually.be.true,
+        .should.eventually.be.false,
     ]);
   });
 });
